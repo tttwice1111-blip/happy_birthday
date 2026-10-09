@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Happy Birthday, 苡柔！</title>
+  
+  <!-- 引入 Google Fonts 與彩帶特效庫 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root {
+      --bg-cream: #faf6f0;
+      --card-bg: rgba(255, 255, 255, 0.92);
+      --primary-rose: #d48b80;
+      --accent-gold: #c69c6d;
+      --text-dark: #3a322d;
+      --text-muted: #82766f;
+      --shadow-mobile: 0 8px 24px rgba(180, 150, 140, 0.14);
+      --safe-bottom: env(safe-area-inset-bottom, 16px);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #f0ebe4;
+      color: var(--text-dark);
+      font-family: 'Noto Serif TC', serif;
+      line-height: 1.6;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* 手機視窗外框容器 */
+    .mobile-screen {
+      width: 100%;
+      max-width: 440px;
+      min-height: 100vh;
+      background: var(--bg-cream);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(212, 139, 128, 0.1) 0px, transparent 60%),
+        radial-gradient(at 100% 100%, rgba(198, 156, 109, 0.12) 0px, transparent 60%);
+      position: relative;
+      padding-bottom: calc(85px + var(--safe-bottom));
+      box-shadow: 0 0 50px rgba(0, 0, 0, 0.1);
+      overflow-x: hidden;
+    }
+
+    /* 頂部固定狀態條（音樂盒播放器） */
+    .mobile-top-bar {
+      position: sticky;
+      top: 0;
+      z-index: 80;
+      backdrop-filter: blur(14px);
+      background: rgba(250, 246, 240, 0.85);
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(198, 156, 109, 0.15);
+    }
+
+    .top-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--accent-gold);
+      letter-spacing: 0.05em;
+    }
+
+    .music-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #ffffff;
+      padding: 6px 14px;
+      border-radius: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      border: 1px solid rgba(212, 139, 128, 0.25);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .music-disc {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #3a322d;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+    }
+
+    .music-disc.playing {
+      animation: spin 3s linear infinite;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    .music-pill span {
+      font-size: 0.82rem;
+      color: var(--text-dark);
+      font-weight: 600;
+    }
+
+    /* 主要內容區 */
+    .content-area {
+      padding: 0 18px;
+    }
+
+    /* Hero / 蛋糕區塊 */
+    .hero-box {
+      text-align: center;
+      padding: 30px 10px 24px;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      font-size: 0.8rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent-gold);
+      margin-bottom: 8px;
+      font-family: 'Playfair Display', serif;
+    }
+
+    .hero-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 8px;
+      color: var(--text-dark);
+    }
+
+    .hero-desc {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    /* 手機蛋糕卡片 */
+    .cake-card {
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 24px 18px;
+      box-shadow: var(--shadow-mobile);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .cake-art {
+      font-size: 3.6rem;
+      position: relative;
+      margin-bottom: 8px;
+      user-select: none;
+      cursor: pointer;
+    }
+
+    .flame {
+      display: inline-block;
+      color: #ff9f1c;
+      font-size: 1.6rem;
+      animation: flameAnim 1s infinite alternate;
+      transition: opacity 0.4s ease;
+    }
+
+    .flame.off {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    @keyframes flameAnim {
+      0% { transform: scale(0.9) rotate(-3deg); }
+      100% { transform: scale(1.15) rotate(3deg); }
+    }
+
+    .cake-prompt {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+
+    .btn-touch {
+      background: linear-gradient(135deg, var(--primary-rose), var(--accent-gold));
+      color: #fff;
+      border: none;
+      width: 100%;
+      max-width: 260px;
+      padding: 13px 20px;
+      border-radius: 28px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-family: inherit;
+      box-shadow: 0 6px 16px rgba(212, 139, 128, 0.35);
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: transform 0.15s ease, filter 0.15s ease;
+    }
+
+    .btn-touch:active {
+      transform: scale(0.96);
+      filter: brightness(0.95);
+    }
+
+    /* 章節標題 */
+    .section-head {
+      margin: 36px 0 16px;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+
+    .section-head h3 {
+      font-size: 1.25rem;
+      color: var(--text-dark);
+      font-weight: 700;
+    }
+
+    .section-head span {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* 手機記憶小遊戲區 */
+    .game-box {
+      background: var(--card-bg);
+      border-radius: 22px;
+      padding: 18px 14px;
+      box-shadow: var(--shadow-mobile);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+    }
+
+    .game-status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      padding: 0 4px;
+    }
+
+    .game-status-bar strong {
+      color: var(--primary-rose);
+    }
+
+    .btn-reset-mini {
+      background: #f7f1ea;
+      border: 1px solid var(--accent-gold);
+      color: var(--accent-gold);
+      border-radius: 16px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .game-grid-mobile {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .card-m {
+      aspect-ratio: 1;
+      perspective: 600px;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .card-m-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-style: preserve-3d;
+      border-radius: 12px;
+    }
+
+    .card-m.is-flipped .card-m-inner,
+    .card-m.is-matched .card-m-inner {
+      transform: rotateY(180deg);
+    }
+
+    .c-front, .c-back {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+    }
+
+    .c-front {
+      background: #ffffff;
+      border: 1.5px dashed rgba(198, 156, 109, 0.5);
+      color: var(--accent-gold);
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .c-back {
+      background: #fff8f5;
+      border: 1.5px solid var(--primary-rose);
+      transform: rotateY(180deg);
+      font-size: 1.7rem;
+    }
+
+    .card-m.is-matched .c-back {
+      background: #f2f8f4;
+      border-color: #6bb07d;
+    }
+
+    /* 手機拍立得純照片展示牆 */
+    .polaroid-column {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .polaroid-m-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 12px 12px 18px;
+      box-shadow: var(--shadow-mobile);
+      transition: transform 0.2s ease;
+    }
+
+    .polaroid-m-card img {
+      width: 100%;
+      height: 230px;
+      object-fit: cover;
+      border-radius: 8px;
+      background: #f5efe8;
+      display: block;
+    }
+
+    .polaroid-m-caption {
+      margin-top: 12px;
+      font-size: 0.95rem;
+      color: var(--text-dark);
+      text-align: center;
+      letter-spacing: 0.03em;
+    }
+
+    /* 手機底部懸浮導覽列 (Bottom Dock) */
+    .mobile-dock {
+      position: fixed;
+      bottom: var(--safe-bottom);
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 400px;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(16px);
+      border-radius: 35px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 12px;
+      z-index: 99;
+    }
+
+    .dock-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      gap: 3px;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .dock-item span:first-child {
+      font-size: 1.15rem;
+    }
+
+    .dock-item:active {
+      transform: scale(0.9);
+      color: var(--primary-rose);
+    }
+
+    /* 手機版 Bottom Sheet 彈窗 */
+    .sheet-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(30, 24, 20, 0.6);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 120;
+    }
+
+    .sheet-overlay.open {
+      display: flex;
+    }
+
+    .sheet-panel {
+      background: #fffefb;
+      width: 100%;
+      max-width: 440px;
+      border-radius: 28px 28px 0 0;
+      padding: 24px 22px calc(24px + var(--safe-bottom));
+      max-height: 85vh;
+      overflow-y: auto;
+      position: relative;
+      box-shadow: 0 -10px 40px rgba(0,0,0,0.15);
+      animation: sheetUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes sheetUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .sheet-close-bar {
+      width: 40px;
+      height: 4px;
+      background: #ddd;
+      border-radius: 2px;
+      margin: 0 auto 16px;
+    }
+
+    .sheet-letter-text {
+      font-size: 1rem;
+      line-height: 1.9;
+      color: var(--text-dark);
+      white-space: pre-line;
+      text-align: justify;
+    }
+
+    /* 特權卡列表 */
+    .coupon-item {
+      background: #fff;
+      border: 1.5px dashed var(--accent-gold);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .coupon-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 2px;
+    }
+
+    .coupon-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .btn-stamp {
+      background: var(--bg-cream);
+      border: 1px solid var(--primary-rose);
+      color: var(--primary-rose);
+      border-radius: 16px;
+      padding: 5px 12px;
+      font-size: 0.78rem;
+      white-space: nowrap;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .btn-stamp.stamped {
+      background: #e76f51;
+      color: #fff;
+      border-color: #e76f51;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 背景音訊：讀取 4.mp3 / 4.m4a / 4.wav -->
+  <audio id="bgm" loop preload="auto">
+    <source src="4.mp3" type="audio/mpeg">
+    <source src="4.m4a" type="audio/mp4">
+    <source src="4.wav" type="audio/wav">
+  </audio>
+
+  <!-- 手機主容器 -->
+  <div class="mobile-screen">
+
+    <!-- 頂部吸頂狀態列（音樂盒控制） -->
+    <header class="mobile-top-bar">
+      <div class="top-logo">Happy Birthday</div>
+      <div class="music-pill" id="musicToggleBtn" onclick="toggleMusic()">
+        <div class="music-disc" id="musicDisc">🎵</div>
+        <span id="musicBtnLabel">播放音樂盒</span>
+      </div>
+    </header>
+
+    <div class="content-area">
+
+      <!-- 區塊 1：Hero & 吹蠟燭許願 -->
+      <section class="hero-box" id="sec-wish">
+        <span class="hero-tag">Special Day for You</span>
+        <h1 class="hero-title">Happy Birthday<br>白苡柔</h1>
+        <p class="hero-desc">願你的新一歲，如繁花綻放，溫柔且堅定。</p>
+
+        <div class="cake-card">
+          <div class="cake-art" id="cakeArt">
+            <span class="flame" id="flame">🔥</span>🎂
+          </div>
+          <p class="cake-prompt" id="cakePrompt">點擊蠟燭或按鈕吹熄它許願</p>
+          <button class="btn-touch" id="wishBtn">許願並吹熄蠟燭 ✨</button>
+        </div>
+      </section>
+
+      <!-- 區塊 2：記憶小遊戲 -->
+      <section id="sec-game">
+        <div class="section-head">
+          <h3>🍰 記憶對對碰</h3>
+          <span>通關解鎖心願特權</span>
+        </div>
+
+        <div class="game-box">
+          <div class="game-status-bar">
+            <span>步數：<strong id="gameMoves">0</strong></span>
+            <span>時間：<strong id="gameTimer">00:00</strong></span>
+            <button class="btn-reset-mini" id="gameResetBtn">洗牌 🔄</button>
+          </div>
+
+          <div class="game-grid-mobile" id="gameGrid"></div>
+        </div>
+      </section>
+
+      <!-- 區塊 3：拍立得回憶光廊（讀取 1.jpg, 2.jpg, 3.jpg） -->
+      <section id="sec-photos">
+        <div class="section-head">
+          <h3>📷 記憶光廊</h3>
+          <span>收藏閃閃發光的每一刻</span>
+        </div>
+
+        <div class="polaroid-column">
+          <div class="polaroid-m-card">
+            <img src="1.jpg" alt="照片 1" onerror="if(!this.dataset.fallback){this.dataset.fallback=1;this.src='1.png';}">
+            <div class="polaroid-m-caption">溫暖如初的笑臉 🌿</div>
+          </div>
+          <div class="polaroid-m-card">
+            <img src="2.jpg" alt="照片 2" onerror="if(!this.dataset.fallback){this.dataset.fallback=1;this.src='2.png';}">
+            <div class="polaroid-m-caption">閃閃發光的每一步 ✨</div>
+          </div>
+          <div class="polaroid-m-card">
+            <img src="3.jpg" alt="照片 3" onerror="if(!this.dataset.fallback){this.dataset.fallback=1;this.src='3.png';}">
+            <div class="polaroid-m-caption">下一段旅程繼續前行 🌸</div>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /content-area -->
+
+    <!-- 底部懸浮導覽列 (Bottom Dock) -->
+    <nav class="mobile-dock">
+      <div class="dock-item" onclick="scrollToSec('sec-wish')">
+        <span>🎂</span>
+        <span>許願</span>
+      </div>
+      <div class="dock-item" onclick="scrollToSec('sec-game')">
+        <span>🎮</span>
+        <span>遊戲</span>
+      </div>
+      <div class="dock-item" onclick="scrollToSec('sec-photos')">
+        <span>📷</span>
+        <span>相冊</span>
+      </div>
+      <div class="dock-item" onclick="openSheet('letterSheet')">
+        <span>✉️</span>
+        <span>心意</span>
+      </div>
+    </nav>
+
+    <!-- 抽屜 1：寫給苡柔的信 -->
+    <div class="sheet-overlay" id="letterSheet">
+      <div class="sheet-panel">
+        <div class="sheet-close-bar" onclick="closeSheet('letterSheet')"></div>
+        <div style="text-align: right; margin-bottom: 8px;">
+          <button style="border:none;background:none;font-size:1.4rem;color:#999;cursor:pointer;" onclick="closeSheet('letterSheet')">&times;</button>
+        </div>
+        <div class="sheet-letter-text">
+          親愛的苡柔：
+
+          祝你生日快樂！🎂
+
+          願你在奔赴未來的每一段路上，身邊總有溫暖的風相伴，眼裡始終閃爍著光芒。生活或許偶爾繁瑣，但請記得隨時停下腳步，感受那些微小而真實的小幸運。
+
+          謝謝你一直以來的溫柔與陪伴，新的一歲，繼續開心地做自己最喜歡的模樣吧！
+        </div>
+        <div style="text-align: right; margin-top: 24px; color: var(--accent-gold); font-weight:600;">
+          —— 最真摯的祝福
+        </div>
+      </div>
+    </div>
+
+    <!-- 抽屜 2：遊戲通關獎勵特權券 -->
+    <div class="sheet-overlay" id="rewardSheet">
+      <div class="sheet-panel">
+        <div class="sheet-close-bar" onclick="closeSheet('rewardSheet')"></div>
+        <div style="text-align: right; margin-bottom: 8px;">
+          <button style="border:none;background:none;font-size:1.4rem;color:#999;cursor:pointer;" onclick="closeSheet('rewardSheet')">&times;</button>
+        </div>
+        <div style="text-align: center; margin-bottom: 18px;">
+          <div style="font-size: 2.4rem;">🎉</div>
+          <h3 style="color: var(--text-dark); margin-top: 4px;">恭喜苡柔通關！</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">已解鎖專屬生日特權，點擊即可立即生效！</p>
+        </div>
+
+        <div class="coupon-item">
+          <div>
+            <div class="coupon-title">🍽️ 大餐任選券</div>
+            <div class="coupon-sub">指定想吃的大餐或甜點，無條件陪同！</div>
+          </div>
+          <button class="btn-stamp" onclick="stampCoupon(this)">蓋章生效</button>
+        </div>
+
+        <div class="coupon-item">
+          <div>
+            <div class="coupon-title">☕ 隨叫隨到咖啡券</div>
+            <div class="coupon-sub">想喝咖啡或飲料時隨叫隨到！</div>
+          </div>
+          <button class="btn-stamp" onclick="stampCoupon(this)">蓋章生效</button>
+        </div>
+
+        <div class="coupon-item">
+          <div>
+            <div class="coupon-title">👑 壽星任性一日券</div>
+            <div class="coupon-sub">今天壽星最大，享有 100% 聽令服從權！</div>
+          </div>
+          <button class="btn-stamp" onclick="stampCoupon(this)">蓋章生效</button>
+        </div>
+
+        <div class="coupon-item">
+          <div>
+            <div class="coupon-title">🌊 散心放空漫遊券</div>
+            <div class="coupon-sub">說走就走的一日小旅行或看海放空！</div>
+          </div>
+          <button class="btn-stamp" onclick="stampCoupon(this)">蓋章生效</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /mobile-screen -->
+
+  <script>
+    /* ================= 導覽平滑捲動 ================= */
+    function scrollToSec(id) {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    /* ================= 背景音樂控制 (4.mp3) ================= */
+    const bgm = document.getElementById('bgm');
+    const musicDisc = document.getElementById('musicDisc');
+    const musicBtnLabel = document.getElementById('musicBtnLabel');
+    let isMusicPlaying = false;
+
+    function toggleMusic() {
+      if (isMusicPlaying) {
+        bgm.pause();
+        musicDisc.classList.remove('playing');
+        musicBtnLabel.textContent = "播放音樂盒";
+        isMusicPlaying = false;
+      } else {
+        bgm.play().then(() => {
+          musicDisc.classList.add('playing');
+          musicBtnLabel.textContent = "暫停音樂盒";
+          isMusicPlaying = true;
+        }).catch(err => {
+          console.warn("音訊播放被瀏覽器阻擋或尚未載入完成:", err);
+        });
+      }
+    }
+
+    /* ================= 吹蠟燭互動 ================= */
+    const flame = document.getElementById('flame');
+    const cakePrompt = document.getElementById('cakePrompt');
+    const wishBtn = document.getElementById('wishBtn');
+    const cakeArt = document.getElementById('cakeArt');
+    let candleBlown = false;
+
+    function blowCandle() {
+      if (candleBlown) return;
+      candleBlown = true;
+      flame.classList.add('off');
+      cakePrompt.textContent = "✨ 願望已封存，生日快樂，苡柔！ ✨";
+      cakePrompt.style.color = "var(--primary-rose)";
+      cakePrompt.style.fontWeight = "600";
+      wishBtn.style.display = "none";
+
+      // 吹熄蠟燭時同步開啟音樂盒
+      if (!isMusicPlaying) {
+        toggleMusic();
+      }
+
+      confetti({
+        particleCount: 120,
+        spread: 80,
+        origin: { y: 0.6 },
+        colors: ['#d48b80', '#c69c6d', '#f4a261', '#ffffff']
+      });
+    }
+
+    wishBtn.addEventListener('click', blowCandle);
+    cakeArt.addEventListener('click', blowCandle);
+
+    /* ================= 手機記憶對對碰小遊戲 ================= */
+    const gameIcons = ['🎂', '🎁', '🌸', '☕', '🍓', '✨'];
+    const gameGrid = document.getElementById('gameGrid');
+    const gameMovesEl = document.getElementById('gameMoves');
+    const gameTimerEl = document.getElementById('gameTimer');
+    const gameResetBtn = document.getElementById('gameResetBtn');
+
+    let flipped = [];
+    let matched = 0;
+    let moves = 0;
+    let timer = null;
+    let seconds = 0;
+    let gameStarted = false;
+
+    function initGame() {
+      clearInterval(timer);
+      timer = null;
+      seconds = 0;
+      moves = 0;
+      matched = 0;
+      flipped = [];
+      gameStarted = false;
+      gameMovesEl.textContent = '0';
+      gameTimerEl.textContent = '00:00';
+      gameGrid.innerHTML = '';
+
+      const deck = [...gameIcons, ...gameIcons].sort(() => 0.5 - Math.random());
+
+      deck.forEach((icon) => {
+        const card = document.createElement('div');
+        card.className = 'card-m';
+        card.dataset.icon = icon;
+        card.innerHTML = `
+          <div class="card-m-inner">
+            <div class="c-front">?</div>
+            <div class="c-back">${icon}</div>
+          </div>
+        `;
+        card.addEventListener('click', () => onCardTap(card));
+        gameGrid.appendChild(card);
+      });
+    }
+
+    function onCardTap(card) {
+      if (!gameStarted) {
+        gameStarted = true;
+        timer = setInterval(() => {
+          seconds++;
+          const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+          const s = String(seconds % 60).padStart(2, '0');
+          gameTimerEl.textContent = `${m}:${s}`;
+        }, 1000);
+      }
+
+      if (card.classList.contains('is-flipped') || card.classList.contains('is-matched') || flipped.length === 2) {
+        return;
+      }
+
+      card.classList.add('is-flipped');
+      flipped.push(card);
+
+      if (flipped.length === 2) {
+        moves++;
+        gameMovesEl.textContent = moves;
+        const [c1, c2] = flipped;
+        if (c1.dataset.icon === c2.dataset.icon) {
+          setTimeout(() => {
+            c1.classList.add('is-matched');
+            c2.classList.add('is-matched');
+            flipped = [];
+            matched++;
+            if (matched === gameIcons.length) {
+              clearInterval(timer);
+              confetti({ particleCount: 140, spread: 85, origin: { y: 0.5 } });
+              setTimeout(() => openSheet('rewardSheet'), 600);
+            }
+          }, 250);
+        } else {
+          setTimeout(() => {
+            c1.classList.remove('is-flipped');
+            c2.classList.remove('is-flipped');
+            flipped = [];
+          }, 700);
+        }
+      }
+    }
+
+    gameResetBtn.addEventListener('click', initGame);
+
+    function stampCoupon(btn) {
+      btn.textContent = "💮 已生效";
+      btn.classList.add('stamped');
+      confetti({ particleCount: 30, spread: 40, origin: { y: 0.7 } });
+    }
+
+    /* ================= 抽屜 Modal 控制 ================= */
+    function openSheet(id) {
+      document.getElementById(id).classList.add('open');
+    }
+
+    function closeSheet(id) {
+      document.getElementById(id).classList.remove('open');
+    }
+
+    document.querySelectorAll('.sheet-overlay').forEach(overlay => {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) overlay.classList.remove('open');
+      });
+    });
+
+    window.addEventListener('DOMContentLoaded', initGame);
+  </script>
+</body>
+</html>
